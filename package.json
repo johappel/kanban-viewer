@@ -1,14 +1,27 @@
 {
-  "name": "kanban-viewer",
+  "name": "nostre-kanban-viewer",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "Render Nostr Kanban boards (kind 30301/30302/8571) by naddr",
+  "main": "./src/index.mjs",
+  "module": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
+  "keywords": [
+    "nostr",
+    "kanban",
+    "ndk",
+    "viewer"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",

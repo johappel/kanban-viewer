@@ -14,6 +14,57 @@ Dieses Projekt zeigt den kompletten Read-Flow:
 
 Der zentrale Punkt ist [`buildBoardFromNostr`](./boardFromNostr.js).
 
+## Als npm Modul verwenden
+
+Das Repo ist auch als Modul vorbereitet und exportiert `KanbanBoardViewer`.
+
+```js
+import { KanbanBoardViewer } from "https://cdn.jsdelivr.net/gh/johappel/kanban-viewer@main/src/index.mjs";
+
+const viewer = new KanbanBoardViewer({
+  boardElement: document.getElementById("board"),
+  boardMetaElement: document.getElementById("boardMeta"),
+  statusElement: document.getElementById("status"),
+});
+
+await viewer.load({
+  naddr: "naddr1...",
+  relays: ["wss://relay.damus.io", "wss://nos.lol"],
+});
+```
+
+### Quick Start direkt aus GitHub (ohne npm publish)
+
+Du kannst das Paket direkt aus dem GitHub-Repo installieren:
+
+```bash
+npm i github:johappel/kanban-viewer
+```
+
+Danach nutzt du es identisch:
+
+```js
+import { KanbanBoardViewer } from "nostre-kanban-viewer";
+
+const viewer = new KanbanBoardViewer({
+  boardElement: document.getElementById("board"),
+  boardMetaElement: document.getElementById("boardMeta"),
+  statusElement: document.getElementById("status"),
+});
+
+await viewer.load({
+  naddr: "naddr1...",
+  relays: ["wss://relay.damus.io"],
+});
+```
+
+Für reine Datenrekonstruktion ohne UI:
+
+```js
+import NDK from "@nostr-dev-kit/ndk";
+import { buildBoardFromNostr } from "nostre-kanban-viewer";
+```
+
 ## Setup
 
 Voraussetzungen:
