@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban Viewer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+     <header class="topbar">
+      <h1>Nostr Kanban Viewer</h1>
+      <p>Einfaches Board-Rendering aus Nostr-Events</p>
+    </header>
+    <main class="container">
+        <div id="status"></div>
+        <div id="boardMeta"></div>
+        <div id="board" style="display: flex; gap: 1rem;"></div>   
+    </main>
+    
+    <script type="importmap">
+      {
+        "imports": {
+          "@nostr-dev-kit/ndk": "https://esm.sh/@nostr-dev-kit/ndk?bundle",
+          "nostr-tools": "https://esm.sh/nostr-tools?bundle",
+          "marked": "https://esm.sh/marked?bundle",
+          "nostre-kanban-viewer": "https://cdn.jsdelivr.net/gh/johappel/kanban-viewer@main/src/index.mjs"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { KanbanBoardViewer } from "nostre-kanban-viewer";
+
+      const viewer = new KanbanBoardViewer({
+        boardElement: document.getElementById("board"),
+        boardMetaElement: document.getElementById("boardMeta"),
+        statusElement: document.getElementById("status")
+      });
+
+      await viewer.load({
+        naddr: "naddr1qvzqqqrkt5pzqksjks0vzk6xvvs73rphr03dc37eryleeza6f2cfl3gqgk7nttklqythwumn8ghj7un9d3shjtn9v36kvet9vshx7un8qydhwumn8ghj7un9d3shjttjwp5juetyw4nx2ety9ehhyecpzemhxue69uhhyetvv9ujuurjd9kkzmpwdejhgqgdwaehxw309ahx7uewd3hkcqzqvdjrscnrx4nrzv3exc6nzcnxxenrjdpsv5erzepex9jxvd3cv5ergwfkxymxydrzxqmnxv3hvs6kvc33vdjrwvpsxyurgenpvdnryvqazwfpr",
+        relays: ["wss://relay.damus.io", "wss://nos.lol"]
+      });
+    </script>
+  </body>
+</html>
