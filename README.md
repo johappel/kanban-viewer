@@ -33,6 +33,11 @@ await viewer.load({
 });
 ```
 
+**lokal**: dist-bundle/nostre-kanban-viewer.esm.js downloaden und lokal importieren:
+```js 
+import { KanbanBoardViewer } from "nostre-kanban-viewer.esm.js";
+```
+
 ### Quick Start direkt aus GitHub (ohne npm publish)
 
 Du kannst das Paket direkt aus dem GitHub-Repo installieren:
@@ -217,18 +222,3 @@ Wenn `buildBoardFromNostr` `null` liefert, zeigt die UI „nicht gefunden oder g
 - Trenne Datenrekonstruktion (`buildBoardFromNostr`) vom UI-Rendering.
 - Für Performance kann Kommentar-Laden parallelisiert oder paginiert werden.
 
-## Deploy auf GitHub Pages
-
-Der Deploy ist über GitHub Actions vorbereitet:
-
-- Workflow: [`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml)
-- Trigger: Push auf `main` oder manueller Run
-- Build-Artefakt: `dist/`
-
-Einmalig im GitHub-Repo aktivieren:
-
-1. Repository `Settings` -> `Pages`
-2. Bei `Build and deployment` die Quelle `GitHub Actions` wählen
-3. Einen Commit auf `main` pushen
-
-Die Vite-Konfiguration nutzt `base: "./"` in [`vite.config.js`](./vite.config.js), damit Assets unter GitHub Pages korrekt aufgelöst werden.
