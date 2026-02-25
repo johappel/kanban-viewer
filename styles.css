@@ -148,6 +148,20 @@ body {
   white-space: pre-wrap;
 }
 
+.card-content {
+  margin: 0 0 8px;
+  color: #344054;
+  font-size: 0.9rem;
+}
+
+.card-content > :first-child {
+  margin-top: 0;
+}
+
+.card-content > :last-child {
+  margin-bottom: 0;
+}
+
 .card-meta {
   font-size: 0.78rem;
   color: var(--muted);

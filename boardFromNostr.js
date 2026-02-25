@@ -7,11 +7,16 @@ const KINDS = {
 };
 
 const asMs = (value) => (typeof value === "number" ? value * 1000 : 0);
+const chunk = (arr, size) => {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+};
 
 export async function buildBoardFromNostr(ndk, ownerPubkey, boardId) {
   const boardRef = `30301:${ownerPubkey}:${boardId}`;
 
-  const [boardEvent, cardEvents, patchByA, patchByD, deleteEvents] = await Promise.all([
+  const [boardEvent, cardEvents, patchByA, patchByD] = await Promise.all([
     ndk.fetchEvent({
       kinds: [KINDS.BOARD],
       authors: [ownerPubkey],
@@ -28,9 +33,6 @@ export async function buildBoardFromNostr(ndk, ownerPubkey, boardId) {
     ndk.fetchEvents({
       kinds: [KINDS.PATCH],
       "#d": [boardId],
-    }),
-    ndk.fetchEvents({
-      kinds: [KINDS.DELETE],
     }),
   ]);
 
@@ -133,11 +135,35 @@ export async function buildBoardFromNostr(ndk, ownerPubkey, boardId) {
     }
   }
 
+  const allCards = board.columns.flatMap((c) => c.cards);
+  const cardRefById = new Map(
+    allCards.map((card) => [card.id, `30302:${card.author || ownerPubkey}:${card.id}`])
+  );
+
+  // Scope kind:5 requests to the relevant board/card addresses instead of querying global deletes.
+  const deleteRefs = [`30301:${ownerPubkey}:${boardId}`, ...cardRefById.values()];
+  const deleteChunks = chunk(deleteRefs, 100);
+  const deleteChunkResults = await Promise.all(
+    deleteChunks.map((refs) =>
+      ndk.fetchEvents({
+        kinds: [KINDS.DELETE],
+        "#a": refs,
+      })
+    )
+  );
+  const deleteMap = new Map();
+  for (const events of deleteChunkResults) {
+    for (const e of events) {
+      if (e?.id) deleteMap.set(e.id, e);
+    }
+  }
+  const deleteEvents = [...deleteMap.values()];
+
   for (const event of deleteEvents) {
     const aTags = (event.tags || []).filter((t) => t[0] === "a").map((t) => t[1]);
     for (const ref of aTags) {
       if (!ref) continue;
-      if (ref.startsWith(`30301:${ownerPubkey}:${boardId}`)) {
+      if (ref === `30301:${ownerPubkey}:${boardId}`) {
         return null;
       }
       if (ref.startsWith("30302:")) {
@@ -149,22 +175,46 @@ export async function buildBoardFromNostr(ndk, ownerPubkey, boardId) {
     }
   }
 
+  const remainingCards = board.columns.flatMap((c) => c.cards);
+  const remainingCardRefs = remainingCards.map(
+    (card) => `30302:${card.author || ownerPubkey}:${card.id}`
+  );
+  const commentsByCardRef = new Map(remainingCardRefs.map((ref) => [ref, []]));
+
+  // Batch comment fetches by #a tag to avoid one round-trip per card.
+  const commentChunks = chunk(remainingCardRefs, 100);
+  const commentResults = await Promise.all(
+    commentChunks.map((refs) =>
+      ndk.fetchEvents({
+        kinds: [KINDS.COMMENT],
+        "#a": refs,
+      })
+    )
+  );
+
+  for (const events of commentResults) {
+    for (const e of events) {
+      const refs = (e.tags || []).filter((t) => t[0] === "a").map((t) => t[1]).filter(Boolean);
+      const comment = {
+        id: e.id || `comment-${e.created_at || 0}`,
+        text: e.content || "",
+        author: e.pubkey,
+        createdAt: e.created_at,
+      };
+      for (const ref of refs) {
+        if (commentsByCardRef.has(ref)) {
+          commentsByCardRef.get(ref).push(comment);
+        }
+      }
+    }
+  }
+
   for (const col of board.columns) {
     for (const card of col.cards) {
       const cardRef = `30302:${card.author || ownerPubkey}:${card.id}`;
-      const comments = await ndk.fetchEvents({
-        kinds: [KINDS.COMMENT],
-        "#a": [cardRef],
-      });
-
-      card.comments = [...comments]
-        .map((e) => ({
-          id: e.id || `${card.id}-${e.created_at || 0}`,
-          text: e.content || "",
-          author: e.pubkey,
-          createdAt: e.created_at,
-        }))
-        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      card.comments = (commentsByCardRef.get(cardRef) || []).sort(
+        (a, b) => (a.createdAt || 0) - (b.createdAt || 0)
+      );
     }
   }
 

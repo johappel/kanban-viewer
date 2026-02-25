@@ -9,15 +9,48 @@ const relaysInput = document.getElementById("relays");
 const loadBtn = document.getElementById("loadBtn");
 
 let depsPromise;
+let markdownToHtml = (text) =>
+  String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\n", "<br>");
+
+function normalizeCardContent(raw) {
+  return String(raw || "").replaceAll("+++", "").trim();
+}
+
+function shortPubkey(pubkey) {
+  const value = String(pubkey || "");
+  if (value.length <= 16) return value || "unbekannt";
+  return `${value.slice(0, 8)}...${value.slice(-8)}`;
+}
+
+function createAuthorLink(pubkey) {
+  const a = document.createElement("a");
+  const value = String(pubkey || "");
+  if (!value) {
+    a.textContent = "unbekannt";
+    return a;
+  }
+  a.href = `https://njump.me/${value}`;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.textContent = shortPubkey(value);
+  return a;
+}
+
 async function loadDeps() {
   if (depsPromise) return depsPromise;
 
   depsPromise = (async () => {
     try {
-      const [ndkMod, nostrTools] = await Promise.all([
+      const [ndkMod, nostrTools, markedMod] = await Promise.all([
         import("@nostr-dev-kit/ndk"),
         import("nostr-tools"),
+        import("marked"),
       ]);
+      markdownToHtml = (text) => markedMod.marked.parse(normalizeCardContent(text), { breaks: true });
       return {
         NDK: ndkMod.default,
         nip19: nostrTools.nip19,
@@ -41,8 +74,9 @@ function renderBoardMeta(board) {
   boardMetaEl.innerHTML = "";
   const title = document.createElement("h2");
   title.textContent = board.name;
-  const desc = document.createElement("p");
-  desc.textContent = board.description || "Keine Beschreibung";
+  const desc = document.createElement("div");
+  desc.className = "card-content";
+  desc.innerHTML = markdownToHtml(board.description || "Keine Beschreibung");
   boardMetaEl.appendChild(title);
   boardMetaEl.appendChild(desc);
 }
@@ -93,14 +127,19 @@ function renderBoard(board) {
       cardEl.appendChild(heading);
 
       if (card.content) {
-        const content = document.createElement("p");
-        content.textContent = card.content;
+        const content = document.createElement("div");
+        content.className = "card-content";
+        content.innerHTML = markdownToHtml(card.content);
         cardEl.appendChild(content);
       }
 
       const meta = document.createElement("div");
       meta.className = "card-meta";
-      meta.textContent = `Autor: ${card.author || "unbekannt"}${card.rank !== undefined ? ` | Rank: ${card.rank}` : ""}`;
+      meta.append("Autor: ");
+      meta.appendChild(createAuthorLink(card.author));
+      if (card.rank !== undefined) {
+        meta.append(` | Rank: ${card.rank}`);
+      }
       cardEl.appendChild(meta);
 
       if (card.comments?.length) {
@@ -109,7 +148,8 @@ function renderBoard(board) {
         for (const comment of card.comments) {
           const c = document.createElement("div");
           c.className = "comment";
-          c.textContent = `${comment.author}: ${comment.text}`;
+          c.appendChild(createAuthorLink(comment.author));
+          c.append(`: ${comment.text}`);
           commentsEl.appendChild(c);
         }
         cardEl.appendChild(commentsEl);
@@ -169,6 +209,7 @@ loadBtn.addEventListener("click", async () => {
     boardEl.innerHTML = "";
     boardMetaEl.innerHTML = "";
 
+    await loadDeps();
     const naddrData = await decodeNaddr(naddr);
     const relayUrls = [...new Set([...relayUrlsFromInput, ...(naddrData.relays || [])])];
 
