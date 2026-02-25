@@ -165,3 +165,19 @@ Wenn `buildBoardFromNostr` `null` liefert, zeigt die UI „nicht gefunden oder g
 - Nutze den Flow als Blaupause für SSR oder Framework-Integrationen.
 - Trenne Datenrekonstruktion (`buildBoardFromNostr`) vom UI-Rendering.
 - Für Performance kann Kommentar-Laden parallelisiert oder paginiert werden.
+
+## Deploy auf GitHub Pages
+
+Der Deploy ist über GitHub Actions vorbereitet:
+
+- Workflow: [`.github/workflows/deploy-pages.yml`](./.github/workflows/deploy-pages.yml)
+- Trigger: Push auf `main` oder manueller Run
+- Build-Artefakt: `dist/`
+
+Einmalig im GitHub-Repo aktivieren:
+
+1. Repository `Settings` -> `Pages`
+2. Bei `Build and deployment` die Quelle `GitHub Actions` wählen
+3. Einen Commit auf `main` pushen
+
+Die Vite-Konfiguration nutzt `base: "./"` in [`vite.config.js`](./vite.config.js), damit Assets unter GitHub Pages korrekt aufgelöst werden.
