@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nostr Kanban Viewer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Nostr Kanban Viewer</h1>
+      <p>Einfaches Board-Rendering aus Nostr-Events</p>
+    </header>
+
+    <main class="container">
+      <section class="controls">
+        <label>
+          Board `naddr`
+          <input id="naddr" type="text" placeholder="naddr1..." />
+        </label>
+        <label>
+          Relays (kommagetrennt)
+          <input
+            id="relays"
+            type="text"
+            value="wss://relay.edufeed.org,wss://relay-rpi.edufeed.org"
+          />
+        </label>
+        <button id="loadBtn" type="button">Board laden</button>
+      </section>
+
+      <section id="status" class="status">Bereit.</section>
+      <section id="boardMeta" class="board-meta"></section>
+      <section id="board" class="board"></section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "kanban-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@nostr-dev-kit/ndk": "^3.0.3",
+    "nostr-tools": "^2.23.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}

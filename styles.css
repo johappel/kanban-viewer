@@ -1,0 +1,170 @@
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #1d2939;
+  --muted: #667085;
+  --border: #d0d5dd;
+  --accent: #0b6bcb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.topbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.container {
+  padding: 16px;
+}
+
+.controls {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.controls input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.controls button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.status {
+  min-height: 24px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.board-meta {
+  margin-bottom: 12px;
+}
+
+.board-meta h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.board-meta p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 300px;
+  min-width: 300px;
+  padding: 10px;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.column-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.column-count {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.card + .card {
+  margin-top: 10px;
+}
+
+.card h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.card p {
+  margin: 0 0 8px;
+  color: #344054;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.card-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.comments {
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
+.comment {
+  font-size: 0.8rem;
+  color: #475467;
+}
+
+.empty {
+  color: var(--muted);
+  font-style: italic;
+}
